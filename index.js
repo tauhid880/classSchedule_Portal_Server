@@ -41,6 +41,13 @@ async function run() {
       res.send(users);
     });
 
+    //get all users
+    app.get("/allusers", async (req, res) => {
+      const query = {};
+      const users = await usersCollection.find(query).toArray();
+      res.send(users);
+    });
+
     // post schedule Data
     app.post("/schedules", async (req, res) => {
       const data = req.body;
@@ -48,7 +55,14 @@ async function run() {
       res.send(result);
     });
 
-    // get schedule Data
+    //get all schedule Data
+    app.get("/allschedules", async (req, res) => {
+      const query = {};
+      const allSchedules = await scheduleDataCollection.find(query).toArray();
+      res.send(allSchedules);
+    });
+
+    // get user-wise schedule Data
     app.get("/schedules", async (req, res) => {
       const Faculty_Email = req.query.Faculty_Email;
       const query = { Faculty_Email };
@@ -66,9 +80,11 @@ async function run() {
 
     //get user-wise messages
     app.get("/messages", async (req, res) => {
-      // const email = req.query.email;
-      const query = {};
-      const messages = await messagesCollection.find(query).toArray();
+      const messages = await messagesCollection
+        .find()
+        .sort({ _id: -1 })
+        .limit(15)
+        .toArray();
       res.send(messages);
     });
   } finally {
