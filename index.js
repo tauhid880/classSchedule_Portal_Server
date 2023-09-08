@@ -70,15 +70,12 @@ async function run() {
       res.send(schedules);
     });
 
-    // Delete schedule data
+    // // Delete schedule data
+
     app.delete("/allschedules/:id", async (req, res) => {
+      // res.setHeader("Access-Control-Allow-Origin", "*");
       const id = req.params.id;
-
-      // Create an ObjectId from the id
-      const objectId = new ObjectId(id);
-
-      // Define the query to find the document by _id
-      const query = { _id: objectId };
+      const query = { _id: new ObjectId(id) };
 
       try {
         const result = await scheduleDataCollection.deleteOne(query);
@@ -102,6 +99,24 @@ async function run() {
       res.send(result);
     });
 
+    // Delete message data
+    app.delete("/messages/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+
+      try {
+        const result = await messagesCollection.deleteOne(query);
+
+        if (result.deletedCount === 1) {
+          res.status(204).send(); // Successful deletion with no content
+        } else {
+          res.status(404).json({ error: "Document not found" });
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        res.status(500).json({ error: "Internal server error" });
+      }
+    });
     //get user-wise messages
     app.get("/messages", async (req, res) => {
       const messages = await messagesCollection
