@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 require("dotenv").config();
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const port = process.env.PORT || 5000;
 
 // Middleware
@@ -68,6 +68,30 @@ async function run() {
       const query = { Faculty_Email };
       const schedules = await scheduleDataCollection.find(query).toArray();
       res.send(schedules);
+    });
+
+    // Delete schedule data
+    app.delete("/allschedules/:id", async (req, res) => {
+      const id = req.params.id;
+
+      // Create an ObjectId from the id
+      const objectId = new ObjectId(id);
+
+      // Define the query to find the document by _id
+      const query = { _id: objectId };
+
+      try {
+        const result = await scheduleDataCollection.deleteOne(query);
+
+        if (result.deletedCount === 1) {
+          res.status(204).send(); // Successful deletion with no content
+        } else {
+          res.status(404).json({ error: "Document not found" });
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        res.status(500).json({ error: "Internal server error" });
+      }
     });
 
     // Post messages
