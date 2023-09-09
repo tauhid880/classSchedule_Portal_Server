@@ -48,6 +48,27 @@ async function run() {
       res.send(users);
     });
 
+    // // Delete user data
+
+    app.delete("/allusers/:id", async (req, res) => {
+      // res.setHeader("Access-Control-Allow-Origin", "*");
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+
+      try {
+        const result = await usersCollection.deleteOne(query);
+
+        if (result.deletedCount === 1) {
+          res.status(204).send(); // Successful deletion with no content
+        } else {
+          res.status(404).json({ error: "Document not found" });
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        res.status(500).json({ error: "Internal server error" });
+      }
+    });
+
     // post schedule Data
     app.post("/schedules", async (req, res) => {
       const data = req.body;
